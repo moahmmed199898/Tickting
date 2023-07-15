@@ -1,0 +1,44 @@
+version: "2.1"
+services:
+  snipe-it:
+    image: snipe/snipe-it:v6.1.2
+    container_name: snipe-it
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - APP_URL=http://localhost:8080
+      - MYSQL_PORT_3306_TCP_ADDR=mysql
+      - MYSQL_PORT_3306_TCP_PORT=3306
+      - MYSQL_DATABASE=snipeIT
+      - MYSQL_USER=snipeIT
+      - MYSQL_PASSWORD=password
+      - APP_KEY=base64:3gmGU1VhvyX/Maq6kJYWVb30eHSd3FpgOjM84YNCZDM=
+    ports:
+      - 8080:80
+    restart: unless-stopped
+    depends_on:
+      - mysql
+
+
+
+  mysql:
+    image: mysql
+    restart: unless-stopped
+    hostname: mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+
+
+
+
+  phpmyadmin:
+    image: phpmyadmin
+    environment:
+      - PMA_HOST=mysql:3306
+    ports:
+      - 7070:80
+    depends_on:
+      - mysql
