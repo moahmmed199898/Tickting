@@ -1,8 +1,9 @@
 version: "2.1"
 services:
-  snipe-it:
+  snipeit:
     image: snipe/snipe-it:v6.1.2
     container_name: snipe-it
+    hostname: snipeit
     environment:
       - PUID=1000
       - PGID=1000
@@ -50,3 +51,6 @@ services:
       - 2000:2000
     volumes:
       - ./backend:/app
+    depends_on:
+      - mysql
+      - snipeit
