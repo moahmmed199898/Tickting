@@ -42,3 +42,11 @@ services:
       - 7070:80
     depends_on:
       - mysql
+
+
+  backend:
+    build: ./backend
+    ports:
+      - 2000:2000
+    volumes:
+      - ./backend:/app
