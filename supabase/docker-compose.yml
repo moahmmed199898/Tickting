@@ -1,42 +1,50 @@
+# Usage
+#   Start:          docker compose up
+#   With helpers:   docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
+#   Stop:           docker compose down
+#   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
+
 version: "3.8"
 
 services:
-
   snipeIT:
-    image: lscr.io/linuxserver/snipe-it:6.1.2
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - APP_URL=http://localhost:8080
-      - MYSQL_PORT_3306_TCP_ADDR=mysql
-      - MYSQL_PORT_3306_TCP_PORT=3306
-      - MYSQL_DATABASE=${SNIEPIT_MYSQL_DB_NAME}
-      - MYSQL_USER=${SNIEPIT_MYSQL_DB_USER}
-      - MYSQL_PASSWORD=${SNIEPIT_MYSQL_DB_USER_PASSWORD}
-    volumes:
-      - ./volumes/snipeIT/config:/config
-    ports:
-      - 8080:80
-    depends_on:
-      - mysql
+  image: lscr.io/linuxserver/snipe-it:6.1.2
+  environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Etc/UTC
+    - APP_URL=http://localhost:8080
+    - MYSQL_PORT_3306_TCP_ADDR=mysql
+    - MYSQL_PORT_3306_TCP_PORT=3306
+    - MYSQL_DATABASE=snipeIT
+    - MYSQL_USER=snipeIT
+    - MYSQL_PASSWORD=password1
+  volumes:
+    - ./volumes/snipeIT/config:/config
+  ports:
+    - 8080:80
+  restart: unless-stopped
+  depends_on:
+    - mysql
 
-  mysql:
-    image: mysql:8.0.31
-    command: --default-authentication-plugin=mysql_native_password
-    hostname: mysql
-    environment:
-      - MYSQL_DATABASE=${SNIEPIT_MYSQL_DB_NAME}
-      - MYSQL_USER=${SNIEPIT_MYSQL_DB_USER}
-      - MYSQL_PASSWORD=${SNIEPIT_MYSQL_DB_USER_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${SNIEPIT_MYSQL_DB_ROOT_PASSWORD}
-    volumes:
-      - ./volumes/mysql/conf:/etc/mysql/conf.d
-      - ./volumes/mysql/mysql:/var/lib/mysql
 
-  studio:
+mysql:
+  image: mysql:8.0.31
+  command: --default-authentication-plugin=mysql_native_password
+  hostname: mysql
+  environment:
+    - MYSQL_DATABASE=snipeIT
+    - MYSQL_USER=snipeIT
+    - MYSQL_PASSWORD=password1
+    - MYSQL_ROOT_PASSWORD=password2
+  volumes:
+    - ./volumes/mysql/conf:/etc/mysql/conf.d
+    - ./volumes/mysql/mysql:/var/lib/mysql
+
+  supabase_studio:
     container_name: supabase-studio
     image: supabase/studio:v0.23.06
+    restart: unless-stopped
     healthcheck:
       test:
         [
@@ -62,9 +70,10 @@ services:
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
-  kong:
+  supabase_kong:
     container_name: supabase-kong
     image: kong:2.8.1
+    restart: unless-stopped
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
@@ -78,9 +87,9 @@ services:
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
       # https://github.com/supabase/supabase/issues/12661
-      - ./supabase/volumes/api/kong.yml:/var/lib/kong/kong.yml:ro
+      - ./volumes/api/kong.yml:/var/lib/kong/kong.yml:ro
 
-  auth:
+  supabase_auth:
     container_name: supabase-auth
     image: supabase/gotrue:v2.62.1
     depends_on:
@@ -100,6 +109,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+    restart: unless-stopped
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
@@ -137,13 +147,14 @@ services:
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
       MFA_ENABLED: ${MFA_ENABLED}
 
-  rest:
+  supabase_rest:
     container_name: supabase-rest
     image: postgrest/postgrest:v11.1.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+    restart: unless-stopped
     environment:
       PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
@@ -151,7 +162,7 @@ services:
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
 
-  realtime:
+  supabase_realtime:
     container_name: realtime-dev.supabase-realtime
     image: supabase/realtime:v2.10.1
     depends_on:
@@ -169,6 +180,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+    restart: unless-stopped
     environment:
       PORT: 4000
       DB_HOST: ${POSTGRES_HOST}
@@ -188,7 +200,7 @@ services:
     command: >
       sh -c "/app/bin/migrate && /app/bin/realtime eval 'Realtime.Release.seeds(Realtime.Repo)' && /app/bin/server"
 
-  storage:
+  supabase_storage:
     container_name: supabase-storage
     image: supabase/storage-api:v0.40.4
     depends_on:
@@ -212,6 +224,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+    restart: unless-stopped
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
@@ -228,9 +241,9 @@ services:
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
     volumes:
-      - ./supabase/volumes/storage:/var/lib/storage:z
+      - ./volumes/storage:/var/lib/storage:z
 
-  imgproxy:
+  supabase_imgproxy:
     container_name: supabase-imgproxy
     image: darthsim/imgproxy:v3.8.0
     healthcheck:
@@ -244,15 +257,16 @@ services:
       IMGPROXY_USE_ETAG: "true"
       IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
     volumes:
-      - ./supabase/volumes/storage:/var/lib/storage:z
+      - ./volumes/storage:/var/lib/storage:z
 
-  meta:
+  supabase_meta:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.66.3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+    restart: unless-stopped
     environment:
       PG_META_PORT: 8080
       PG_META_DB_HOST: ${POSTGRES_HOST}
@@ -261,9 +275,10 @@ services:
       PG_META_DB_USER: supabase_admin
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
-  functions:
+  supabase_functions:
     container_name: supabase-edge-functions
     image: supabase/edge-runtime:v1.5.2
+    restart: unless-stopped
     environment:
       JWT_SECRET: ${JWT_SECRET}
       SUPABASE_URL: http://kong:8000
@@ -273,13 +288,13 @@ services:
       # TODO: Allow configuring VERIFY_JWT per function. This PR might help: https://github.com/supabase/cli/pull/786
       VERIFY_JWT: "${FUNCTIONS_VERIFY_JWT}"
     volumes:
-      - ./supabase/volumes/functions:/home/deno/functions:Z
+      - ./volumes/functions:/home/deno/functions:Z
     command:
       - start
       - --main-service
       - /home/deno/functions/main
 
-  db:
+  supabase_db:
     container_name: supabase-db
     image: supabase/postgres:15.1.0.90
     healthcheck:
@@ -293,6 +308,7 @@ services:
       - config_file=/etc/postgresql/postgresql.conf
       - -c
       - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
+    restart: unless-stopped
     ports:
       # Pass down internal port because it's set dynamically by other services
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
@@ -305,10 +321,10 @@ services:
       PGDATABASE: ${POSTGRES_DB}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./supabase/volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
+      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
-      - ./supabase/volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
+      - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
       # Must be superuser to alter reserved role
-      - ./supabase/volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
+      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       # PGDATA directory is persisted between restarts
-      # - ./supabase/volumes/db/data:/var/lib/postgresql/data:Z
+      # - ./volumes/db/data:/var/lib/postgresql/data:Z
