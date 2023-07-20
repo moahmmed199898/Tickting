@@ -34,6 +34,17 @@ services:
       - ./volumes/mysql/conf:/etc/mysql/conf.d
       - ./volumes/mysql/mysql:/var/lib/mysql
 
+  # next:
+  #   build: ./next_app/
+  #   volumes:
+  #     - ./next_app/:/app/
+  #   ports:
+  #     - 2000:2000
+  #   depends_on:
+  #     - studio
+  #     - mysql
+  #     - snipeIT
+
   studio:
     container_name: supabase-studio
     image: supabase/studio:v0.23.06

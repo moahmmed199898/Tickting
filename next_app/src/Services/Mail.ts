@@ -1,7 +1,4 @@
 import nodemailer from "nodemailer"
-import dotenv from 'dotenv'
-
-dotenv.config()
 
 const transporter = nodemailer.createTransport({
     pool: true,
@@ -12,9 +9,6 @@ const transporter = nodemailer.createTransport({
       pass: process.env.SMTP_PASSWORD,
     },
   });
-
-
-  console.log(transporter)
 
 
 export async function sendEmail(recipient: string, subject: string, html: string) {
