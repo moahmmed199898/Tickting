@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next -p 2000",
+    "dev": "cd .. && docker-compose up -d && cd next_app && next -p 2000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 2000",
     "lint": "next lint"
   },
   "dependencies": {
@@ -25,6 +25,8 @@
     "typescript": "5.1.6"
   },
   "devDependencies": {
-    "@types/nodemailer": "^6.4.8"
+    "@types/nodemailer": "^6.4.8",
+    "encoding": "^0.1.13",
+    "supabase": "^1.82.2"
   }
 }

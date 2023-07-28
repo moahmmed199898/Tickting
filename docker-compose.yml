@@ -323,3 +323,12 @@ services:
       - ./supabase/volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       # PGDATA directory is persisted between restarts
       # - ./supabase/volumes/db/data:/var/lib/postgresql/data:Z
+
+
+  pgadmin4:
+    image: dpage/pgadmin4
+    ports:
+      - "7070:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@user.com
+      - PGADMIN_DEFAULT_PASSWORD=password
