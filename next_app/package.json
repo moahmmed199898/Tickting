@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cd .. && docker-compose up -d && cd next_app && next -p 2000",
+    "dev": "cd .. && npx supabase start && docker-compose up -d && cd next_app && next",
+    "types": "npx supabase gen types typescript  --local > .\\src\\Types\\supabase.d.ts",
     "build": "next build",
     "start": "next start -p 2000",
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.31.0",
     "@types/node": "20.4.2",
     "@types/react": "18.2.15",
     "@types/react-dom": "18.2.7",
