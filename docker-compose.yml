@@ -44,6 +44,6 @@ services:
       - INTERVAL=${INTERVAL}
       - SUPABASE_HOST=${SUPABASE_HOST}
       - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
-    volumes:
-      - ./nodeapps/:/app
+    # volumes:
+    #   - ./nodeapps/:/app
     

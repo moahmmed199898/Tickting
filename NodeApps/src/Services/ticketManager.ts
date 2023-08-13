@@ -11,11 +11,11 @@ export async function addTicketFromMail(message: ParsedMail) {
     console.log(RequesterUID)
     const { data, error } = await supabase.from('ticket').insert([{
         title: message.subject,
-        ticketdescription: message.html,
-        priorityid: 100,
-        categoryid: 0,
-        requesteruid: RequesterUID,
-        statusid: 0
+        ticket_description: message.html,
+        priority_id: 100,
+        category_id: 0,
+        requester_uid: RequesterUID,
+        status_id: 0
     }]).select()
 
     if (error) console.log(error)
@@ -26,7 +26,7 @@ export async function addTicketFromMail(message: ParsedMail) {
 
 
 export async function getUUIDFromEmail(email:string | undefined) {
-    if(email === undefined) throw "NO EMAIL"
+    if(email === undefined) console.error("NO EMAIL")
 
     // find the user
     let { data, error } = await supabase.rpc('get_user_id_by_email', {email})
