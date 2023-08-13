@@ -1,0 +1,24 @@
+{
+  "name": "nodeapps",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && node ./dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mohammed Alkhafaji",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.32.0",
+    "imap": "^0.8.19",
+    "mailparser": "^3.6.5",
+    "node-pop3": "^0.9.0"
+  },
+  "devDependencies": {
+    "@types/imap": "^0.8.37",
+    "@types/mailparser": "^3.4.0",
+    "typescript": "^5.1.6"
+  }
+}

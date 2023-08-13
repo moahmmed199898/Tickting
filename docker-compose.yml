@@ -33,3 +33,17 @@ services:
       - ./volumes/mysql/conf:/etc/mysql/conf.d
       - ./volumes/mysql/mysql:/var/lib/mysql
 
+
+  mail_reciver: 
+    build: ./nodeapps/
+    environment:
+      - POP_HOST=${POP_HOST}
+      - POP_PORT=${POP_PORT}
+      - POP_USERNAME=${POP_USERNAME}
+      - POP_PASSWORD=${POP_PASSWORD}
+      - INTERVAL=${INTERVAL}
+      - SUPABASE_HOST=${SUPABASE_HOST}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+    volumes:
+      - ./nodeapps/:/app
+    
