@@ -54,18 +54,18 @@ create table public.Ticket (
     TicketDescription character varying not null,
     LocationID bigint REFERENCES public.Location (LocationID),
     CategoryID bigint REFERENCES public.Category (CategoryID),
-    Cost decimal not null,
-    ResponsableUID uuid not null REFERENCES auth.users (id),
+    Cost decimal,
+    ResponsableUID uuid REFERENCES auth.users (id),
     ResponsableDepartmentID bigint REFERENCES public.Department(DepartmentID),
     ApprovalUID uuid REFERENCES auth.users (id)
 );
 
 
-ALTER TABLE public.Category ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.Department ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.Location ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.Priority ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.Role ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.Status ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.User ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.Ticket ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.Category ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.Department ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.Location ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.Priority ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.Role ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.Status ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.User ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.Ticket ENABLE ROW LEVEL SECURITY;
