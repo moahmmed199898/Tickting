@@ -2,6 +2,7 @@ version: '3'
 
 services:  
   snipeIT:
+    hostname: snipeIT
     image: lscr.io/linuxserver/snipe-it:6.1.2
     environment:
       - PUID=1000
