@@ -1,26 +1,16 @@
-import { signin, getQuery } from "./Services/Database"
+import {getInfo} from "./Services/Database"
+import { signin } from "./Services/TempServices"
+import { getQuery } from "./Services/Query"
 import { queryTicketMaker } from "./Services/QueryMaker"
 import { Operators } from "./Types/graphql"
 export function Test() {
 
     const fun = async () => {
         await signin()
-        const data = await getQuery(queryTicketMaker(["cost", "ticket_number"], [
-            {
-                field: "cost",
-                operator: Operators.Greater,
-                value: 300
-            },
-            {
-                field: "ticket_number",
-                operator: Operators.Equal,
-                value: 3
-            }
-    
-    ]))
+        const data = await getInfo()
 
 
-        console.log(data?.data)
+        console.log(data)
     }
 
     fun()
